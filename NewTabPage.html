@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- saved from url=(0016)http://localhost -->
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2014 by abhineet97 (http://jsbin.com/hukok/3/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+	<title>New Tab</title>
+
+	<style>
+		@media screen and (min-width:440px) and (max-width:900px){
+			body{
+				font-size: 50%;
+			}
+		}
+		@media screen and (max-width:439px){
+			body{
+				font-size: 50%;
+			}
+		}
+		body {
+			text-align: center;
+			font-family: sans-serif;
+			color: #000;
+			background: #fff;
+		}
+		#remember {
+			font-weight: bold;
+			text-align: center;
+			border: none;
+			border-bottom: solid;
+			margin: auto 35%;
+		}
+		#time {
+			font-size: 12em;
+			margin-bottom: 1%;
+		}
+		#date {
+			font-size: 3em;
+			margin-top: 0;
+		}
+	</style>
+</head>
+
+<body>
+	<p id="time" onclick="changeMode('toggle')">TIME</p>
+	<p id="date">DATE</p>
+	<p id="remember" spellcheck="true" contenteditable="true">Remember</p>
+	<script>
+		var storage = window.localStorage;
+		window.onload =
+			function main() {
+				document.getElementById("date").innerHTML = new Date().toDateString();
+				time();
+			if(!storage.mode) {storage.mode = "day";console.log(localStorage);}
+			if (storage.toRemember !== '' && storage.toRemember)
+				document.getElementById('remember').innerHTML = storage.toRemember;
+			if (storage.mode !== '' && storage.mode) changeMode(storage.mode);
+		};
+
+		document.getElementById('remember').onclick = selectall;
+		document.getElementById('remember').onfocus = selectall;
+		
+		function selectall() {
+			document.execCommand('selectAll', false, null);
+		}
+
+		document.getElementById('remember').onkeypress =
+			function remember() {
+			storage.toRemember = document.getElementById('remember').innerHTML;
+		};
+		document.getElementById('remember').onblur =
+			function unRemember() {
+			if (document.getElementById('remember').innerHTML === ""){
+				document.getElementById('remember').innerHTML = "Remember";
+				storage.toRemember = "";
+			}
+		};
+
+		function time() {
+			var d = new Date();
+			var hour = d.getHours() > 12 ? (d.getHours() - 12) : d.getHours();
+			var min = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+			var ap = d.getHours() > 12 ? "PM" : "AM";
+			document.getElementById("time").innerHTML = hour + ':' + min + ' ' + ap;
+		}
+		setInterval(time, 1000);
+		
+		function changeMode(currentMode){
+			if(currentMode === "day"){
+				document.body.setAttribute("style","background:white;color:black;");
+				storage.mode="day";
+			}
+			else if(currentMode === "night"){
+				document.body.setAttribute("style","background:black;color:white;");
+				storage.mode="night";
+			}
+			else if(currentMode === "toggle"){
+				changeMode(storage.mode=="day"?"night":"day");
+			}
+		}
+	</script>
+</body>
+
+</html>

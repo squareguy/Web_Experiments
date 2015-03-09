@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>ID3 Tag Fixing Helper</title>
+	<meta charset="utf-8">
+	<style>
+	body{
+		text-align: center;font-family: 'Open sans', sans-serif;
+	}
+		iframe{
+			background-size: cover;
+		}
+	</style>
+</head>
+
+<body>
+	<input type="file" multiple>
+	<button>CLICK</button>
+	<script>
+		var input = document.getElementsByTagName('input')[0]
+		var button= document.getElementsByTagName('button')[0];
+		var files = [];
+		input.onchange = function(){
+		for(var j=0;j<input.files.length;j++) files[j] = input.files[j].name;
+		notif("Done!");
+		input.value = "";
+		};
+		button.onclick = function(){
+			if(files.length!==0){
+			var name=files[0];
+			if(name.match('mp3')) name = name.replace(new RegExp('.*?- '),'').replace('.mp3','');
+			else if(name.match('m4a')) name = name.replace(new RegExp('.*?- '),'').replace('.m4a','');
+			window.open ("https://en.wikipedia.org/wiki/Special:Search/"+encodeURIComponent(name), name);
+			files.splice(0,1);
+			}
+		};
+		function ajax(url,func){
+			
+		}
+		function notif(msg){
+			var span = document.createElement('span');
+			span.innerHTML = msg;
+			span.setAttribute("style","display:block;font-weight:bold;border:solid #000;");
+			document.body.insertBefore(span, document.body.firstElementChild);
+			setTimeout(function(){
+				var interv = setInterval(function(){
+					if(span.style.opacity === '0'){ document.body.removeChild(span);clearInterval(interv);}
+					else if(span.style.opacity === '') span.style.opacity = 1;
+					else span.style.opacity = span.style.opacity - 0.1;
+					},500);
+				},2000);
+		}
+	</script>
+</body>
+
+</html>

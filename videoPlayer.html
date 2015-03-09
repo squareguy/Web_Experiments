@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>VideoPlayer</title>
+<meta charset="UTF-8">
+<style>
+body{font-family:'Open Sans', sans-serif;text-align:center;}
+input{display:inline-block;}
+</style>
+</head>
+<body>
+<h1>VideoPlayer</h1>
+<p><input type="file">OR<input type="url" placeholder="Paste URL and hit enter"></p>
+<video controls autoplay hidden></video>
+<script>
+var input = document.getElementsByTagName('input')[0];
+var video = document.getElementsByTagName('video')[0];
+input.onchange = function(event){
+    var file = input.files[0];
+    if(file.type.match('mp4') || file.type.match('webm') || file.type.match('ogg')){
+        var reader = new FileReader();
+        reader.onloadend = function(){plVideo(reader.result)};reader.readAsDataURL(file); input.value="";
+    }
+    else {alert("File type not supported, try again with a different file type.");input.value = "";}
+};
+var inputU = document.getElementsByTagName('input')[1];
+inputU.oninput= function(){
+    if(inputU.checkValidity()){
+    var url = inputU.value;
+    plVideo(url);
+    inputU.value="";
+    }
+    else{alert('Invalid URL');inputU.value="";}
+};
+function plVideo(src){
+    if(video.hidden) video.removeAttribute('hidden');
+    video.src = src;
+}
+video.onclick = function(){
+    if(video.paused) video.play();
+    else video.pause();
+}
+</script>
+</body>
+</html>
