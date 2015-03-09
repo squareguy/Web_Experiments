@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Web_Experiments</title>
+<meta charset="UTF-8">
+</head>
+<body>
+
+<script>
+
+var names = new Array(), contents, readme = new Array(), ajax, info;
+
+window.onload = function() {
+    
+    ajax("https://api.github.com/repos/squareguy/Web_Experiments/contents/", false, function(xhr) {
+        contents = JSON.parse(xhr.response);
+        var ul = document.createElement('ul');
+        for (var i = 0; i < contents.length; i++) {
+            if (contents[i].name.match('html') && contents[i].name !== "index.html") {
+                names.push(contents[i].name);
+                var li = document.createElement('li');
+//                 var a2 = document.createElement('a');
+//                 a2.innerHTML = "Info";
+//                 a2.addEventListener("click", function(){info(i);});
+//                 a2.href = "javascript:void(0);";
+                var a = document.createElement('a');
+                var name = contents[i].name;
+                a.href = name;
+                a.innerHTML = name.split('.')[0];
+                li.appendChild(a);
+//                 li.appendChild(a2);
+                ul.appendChild(li);
+            }
+        }
+        document.body.appendChild(ul);
+    });
+    
+    ajax("https://api.github.com/repos/squareguy/Web_Experiments/readme", true, function(xhr) {
+        var div = document.createElement('div');
+        div.innerHTML = xhr.response;
+        var p = div.getElementsByTagName('p');
+        for (var j = 0; j < names.length; j++) {
+            readme.push(p[j + 1].innerHTML);
+        }
+    });
+};
+
+ajax = function(url, header, func) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.status === 200 && xhr.readyState === 4) {
+            func(xhr);
+        }
+    };
+    xhr.open("GET", url, true);
+    if (header)
+        xhr.setRequestHeader("Accept", "application/vnd.github.v3.html");
+    xhr.send();
+};
+
+// info = function (i){
+//     alert(readme[i]);
+// };
+</script>
+</body>
+</html>
