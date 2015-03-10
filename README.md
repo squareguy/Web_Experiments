@@ -1,5 +1,5 @@
 # Web_Experiments
-Below is the details of all the experiments listed above.
+Below are the details of all the experiments.
 
 ##NewTabPage
 Created a new tab page for myself but never really used it.
