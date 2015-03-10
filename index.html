@@ -1,66 +1,84 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Web_Experiments</title>
-<meta charset="UTF-8">
+  <title>Web_Experiments</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+body {
+    font-family: "Open Sans", sans-serif;
+    margin: auto;
+    color: #333;
+    width:50%;
+}
+
+@media only screen and (max-width:750px){
+  body{
+    width:90%;
+  }
+}
+
+@media only screen and (min-width:1500px){
+  body{
+    width:40%;
+  }
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:before {
+    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQCAYAAAAiYZ4HAAAAZ0lEQVQoU72SOw7AIAxDjcS9aS/eVokaKTIQPgMsLH7GDklYPGlRDwFegszkAlDYMAJEW0EeyAAeejEEuM8wkgdYfP9dio/UA0QsBtqpB1hhfysRATxRHf9ZYGpLWj8dglvLNxXFRB/GxxqHwUhGkAAAAABJRU5ErkJggg==");
+}
+
+code {
+    background-color: #f8f8f8;
+    border: solid #eee 1px;
+}
+</style>
 </head>
+
 <body>
 
 <script>
 
-var names = new Array(), contents, readme = new Array(), ajax, info;
 
-window.onload = function() {
-    
-    ajax("https://api.github.com/repos/squareguy/Web_Experiments/contents/", false, function(xhr) {
-        contents = JSON.parse(xhr.response);
-        var ul = document.createElement('ul');
-        for (var i = 0; i < contents.length; i++) {
-            if (contents[i].name.match('html') && contents[i].name !== "index.html") {
-                names.push(contents[i].name);
-                var li = document.createElement('li');
-//                 var a2 = document.createElement('a');
-//                 a2.innerHTML = "Info";
-//                 a2.addEventListener("click", function(){info(i);});
-//                 a2.href = "javascript:void(0);";
-                var a = document.createElement('a');
-                var name = contents[i].name;
-                a.href = name;
-                a.innerHTML = name.split('.')[0];
-                li.appendChild(a);
-//                 li.appendChild(a2);
-                ul.appendChild(li);
-            }
-        }
-        document.body.appendChild(ul);
-    });
-    
-    ajax("https://api.github.com/repos/squareguy/Web_Experiments/readme", true, function(xhr) {
-        var div = document.createElement('div');
-        div.innerHTML = xhr.response;
-        var p = div.getElementsByTagName('p');
-        for (var j = 0; j < names.length; j++) {
-            readme.push(p[j + 1].innerHTML);
-        }
-    });
-};
+var githubPagesURL = "https://squareguy.github.io/Web_Experiments/";
+var readmeURL = "https://api.github.com/repos/squareguy/Web_Experiments/readme";
 
-ajax = function(url, header, func) {
+document.addEventListener("DOMContentLoaded", function() {
+    
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.status === 200 && xhr.readyState === 4) {
-            func(xhr);
+            var div = document.createElement('div');
+            div.innerHTML = xhr.response;
+            div = div.getElementsByTagName('div')[0];
+            var a = div.getElementsByTagName("a");
+            for (var j = 0; j < a.length; j++) {
+                var aP = a[j].parentElement;
+                aP.removeChild(a[j]);
+                var aD = document.createElement('a');
+                aD.innerHTML = aP.innerHTML;
+                aD.href = githubPagesURL + (j === 0 ? '' : aD.innerHTML);
+                aP.innerHTML = '';
+                aP.appendChild(aD);
+            }
+            document.body.insertBefore(div, document.body.firstChild);
         }
     };
-    xhr.open("GET", url, true);
-    if (header)
-        xhr.setRequestHeader("Accept", "application/vnd.github.v3.html");
+    xhr.open("GET", readmeURL, true);
+    xhr.setRequestHeader("Accept", "application/vnd.github.v3.html");
     xhr.send();
-};
-
-// info = function (i){
-//     alert(readme[i]);
-// };
+});
 </script>
+
 </body>
+
 </html>
