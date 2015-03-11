@@ -2,7 +2,7 @@
 Below are the details of all the experiments.
 
 ##NewTabPage
-A new tab/homepage that shows a random quote using [forismatic's](http://forismatic.com/) API.  
+A new tab/homepage that shows a random quote using [forismatic's](http://forismatic.com/en/) API.  
 The page is responsive for no good reason and becomes white on black, from black on white, at night.
 
 ##id3
