@@ -2,9 +2,8 @@
 Below are the details of all the experiments.
 
 ##NewTabPage
-Created a new tab page for myself but never really used it.
-It contains a clock and a text input below it for remembering things.
-It inverts the colors when the time is clicked and remembers the current colors using LocalStorage.
+A new tab/homepage that shows a random quote using (forismatic's)[http://forismatic.com/] API.  
+The page is responsive for no good reason and becomes white on black, from black on white, at night.
 
 ##id3
 An app I created for helping me fix id3 tags.  
