@@ -7,75 +7,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 
+
+
 body {
-    font-family: "Open Sans", sans-serif;
-    margin: auto;
-    color: #333;
-    width:50%;
+  font-family: "Open Sans", sans-serif;
+  margin: auto;
+  color: #333;
+  width: 50%;
 }
 
-@media only screen and (max-width:750px){
-  body{
+@media only screen and (max-width: 750px) {
+  body {
     width:90%;
   }
 }
 
-@media only screen and (min-width:1500px){
-  body{
+@media only screen and (min-width: 1500px) {
+  body {
     width:40%;
   }
 }
 
 a {
-    color: #333;
-    text-decoration: none;
+  color: #333;
+  text-decoration: none;
 }
+
+p a{
+  color:blue;
+}
+
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
-a:before {
-    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQCAYAAAAiYZ4HAAAAZ0lEQVQoU72SOw7AIAxDjcS9aS/eVokaKTIQPgMsLH7GDklYPGlRDwFegszkAlDYMAJEW0EeyAAeejEEuM8wkgdYfP9dio/UA0QsBtqpB1hhfysRATxRHf9ZYGpLWj8dglvLNxXFRB/GxxqHwUhGkAAAAABJRU5ErkJggg==");
+h2:before {
+  content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQCAYAAAAiYZ4HAAAAZ0lEQVQoU72SOw7AIAxDjcS9aS/eVokaKTIQPgMsLH7GDklYPGlRDwFegszkAlDYMAJEW0EeyAAeejEEuM8wkgdYfP9dio/UA0QsBtqpB1hhfysRATxRHf9ZYGpLWj8dglvLNxXFRB/GxxqHwUhGkAAAAABJRU5ErkJggg==");
 }
 
 code {
-    background-color: #f8f8f8;
-    border: solid #eee 1px;
+  background-color: #f8f8f8;
+  border: solid #eee 1px;
+}
+#loading{
+  z-index:2;
 }
 </style>
 </head>
 
 <body>
-
+<div id="loading">Loading...</div>
 <script>
-
-
 var githubPagesURL = "http://squareguy.github.io/Web_Experiments/";
 var readmeURL = "http://api.github.com/repos/squareguy/Web_Experiments/readme";
 
 document.addEventListener("DOMContentLoaded", function() {
-    
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.status === 200 && xhr.readyState === 4) {
-            var div = document.createElement('div');
-            div.innerHTML = xhr.response;
-            div = div.getElementsByTagName('div')[0];
-            var a = div.getElementsByTagName("a");
-            for (var j = 0; j < a.length; j++) {
-                var aP = a[j].parentElement;
-                aP.removeChild(a[j]);
-                var aD = document.createElement('a');
-                aD.innerHTML = aP.innerHTML;
-                aD.href = githubPagesURL + (j === 0 ? '' : aD.innerHTML);
-                aP.innerHTML = '';
-                aP.appendChild(aD);
-            }
-            document.body.insertBefore(div, document.body.firstChild);
-        }
-    };
-    xhr.open("GET", readmeURL, true);
-    xhr.setRequestHeader("Accept", "application/vnd.github.v3.html");
-    xhr.send();
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.status === 200 && xhr.readyState === 4) {
+      var div = document.createElement('div');
+      div.innerHTML = xhr.response;
+      div = div.getElementsByTagName('div')[0];
+      var a = div.getElementsByTagName("a");
+      for (var j = 0; j < a.length; j++) {
+        if(!a[j].id.match("user-content")) continue;
+        var aP = a[j].parentElement;
+        aP.removeChild(a[j]);
+        var aD = document.createElement('a');
+        aD.innerHTML = aP.innerHTML;
+        aD.href = githubPagesURL + (j === 0 ? '' : aD.innerHTML);
+        aP.innerHTML = '';
+        aP.appendChild(aD);
+      }
+      document.body.insertBefore(div, document.body.firstChild);
+      document.getElementById("loading").hidden = true;
+    }
+  };
+  xhr.open("GET", readmeURL, true);
+  xhr.setRequestHeader("Accept", "application/vnd.github.v3.html");
+  xhr.send();
 });
 </script>
 
