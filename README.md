@@ -10,3 +10,6 @@ Your file is not sent to server, it stays in the browser, JS is used to read the
 ##videoPlayer
 I was experimenting with the HTML5 ```<video>``` tag.  
 It lets you open a video (of supported format) from your hard drive or from a URL.
+
+##Canvas Snake
+Work in progress ```<canvas>``` snake game
