@@ -1,18 +1,20 @@
-var i, score = 0, 
+var i, currentScore = 0, started = false,
 canvas = document.getElementsByTagName("canvas")[0], 
 context = canvas.getContext("2d");
-canvas.width = 500;
-canvas.height = 500;
+canvas.width = canvas.height = 500;
+
+
 var snake = {
-  height: canvas.height / 10,
   width: canvas.width / 10,
   style: "black",
+  size: 1,
   x: 0,
   y: 0,
   speed: 90,
-  move: function(x, y) {
-  }
+  parts: new Array()
 };
+
+
 var food = {
   style: "red",
   x: 0,
@@ -22,67 +24,89 @@ var food = {
   getpossibleXY: function() {
     for (i = 0; i < canvas.width; i += snake.width)
       food.possibleX.push(i);
-    for (i = 0; i < canvas.height; i += snake.height)
+    for (i = 0; i < canvas.height; i += snake.width)
       food.possibleY.push(i);
   },
   generate: function() {
-    if(
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x ||
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x +snake.width ||
-    food.possibleY[Math.floor(Math.random() * food.possibleX.length)] === snake.y ||
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.y + snake.height) food.generate();
+    if (
+    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x || 
+    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x + snake.width || 
+    food.possibleY[Math.floor(Math.random() * food.possibleX.length)] === snake.y || 
+    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.y + snake.width)
+      food.generate();
     else
-    move( food.possibleX[Math.floor(Math.random() * food.possibleX.length)], food.possibleY[Math.floor(Math.random() * food.possibleX.length)], food);
+      move(food.possibleX[Math.floor(Math.random() * food.possibleX.length)], food.possibleY[Math.floor(Math.random() * food.possibleX.length)], food);
   }
 };
-var keysDown = [false, false, false, false], keys = [37, 38, 39, 40];
+
+
+var keysPressed = [false, false, false, false], keys = [37, 38, 39, 40];
+
+
 document.addEventListener("keydown", function(event) {
   for (i = 0; i < keys.length; i++) {
     if (event.keyCode === keys[i])
-      keysDown[i] = true;
+      keysPressed[i] = true;
+    else
+      keysPressed[i] = false;
   }
+  if(!started) started = true;
 });
-document.addEventListener("keyup", function(event) {
-  for (i = 0; i < keys.length; i++) {
-    if (event.keyCode === keys[i])
-      keysDown[i] = false;
-  }
-});
+
+
 food.getpossibleXY();
 console.log(food.possibleX);
 food.generate();
 move(snake.x === 0 ? 0 : snake.x, snake.y === 0 ? 0 : snake.y, snake);
+
+
 setInterval(function() {
   
-  if (keysDown[0])
-    move(snake.x <= 0 ? 0 : (snake.x - snake.width), snake.y, snake);
+  if (keysPressed[0])
+    move(snake.x - snake.width, snake.y, snake);
   
-  else if (keysDown[1])
-    move(snake.x, snake.y <= 0 ? 0 : snake.y - snake.height, snake);
+  else if (keysPressed[1])
+    move(snake.x, snake.y - snake.width, snake);
   
-  else if (keysDown[2])
-    move(snake.x >= (canvas.width - snake.width) ? (canvas.width - snake.width) : (snake.x + snake.width), snake.y, snake);
+  else if (keysPressed[2])
+    move(snake.x + snake.width, snake.y, snake);
   
-  else if (keysDown[3])
-    move(snake.x, snake.y >= (canvas.height - snake.height) ? (canvas.height - snake.height) : snake.y + snake.height, snake);
+  else if (keysPressed[3])
+    move(snake.x, snake.y + snake.width, snake);
+  
+  if (snake.x < 0 || snake.y < 0 || snake.x > canvas.width-snake.width || snake.y > canvas.width - snake.width && started) restart();
 
 }, snake.speed);
+
+
 function move(x, y, type) {
   type.x = x;
   type.y = y;
-  if (snake.x === food.x && snake.y === food.y) {
-    score++;
-    food.generate();
-  }
+  if (snake.x === food.x && snake.y === food.y) score();
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = type.style;
-  context.fillRect(x, y, snake.width, snake.height);
+  context.fillRect(x, y, snake.width, snake.width);
   context.fill();
   if (type === food)
     context.save();
   else {
     context.fillStyle = food.style;
     context.restore();
-    context.fillRect(food.x, food.y, snake.height, snake.width);
+    context.fillRect(food.x, food.y, snake.width, snake.width);
   }
+}
+
+
+function restart() {
+  for(i = 0;i<keysPressed.length;i++)keysPressed[i] = false;
+  move(0, 0, snake);
+  started = false;
+}
+
+
+function score(){
+  currentScore++;
+  snake.size++;
+  //snake.parts.push(x:)
+  food.generate();
 }
