@@ -5,3 +5,6 @@ html, body {
   width: 100%;
   overflow:hidden;
 }
+canvas{
+  border:solid 1px black;
+}

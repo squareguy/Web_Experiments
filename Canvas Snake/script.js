@@ -1,17 +1,30 @@
-var i, currentScore = 0, started = false,
-canvas = document.getElementsByTagName("canvas")[0], 
-context = canvas.getContext("2d");
+var
+canvas = document.getElementsByTagName("canvas")[0],
+context = canvas.getContext("2d"), 
+i, currentScore = 0, started = false, width;
+
+
 canvas.width = canvas.height = 500;
+width = canvas.width / 10;
+renderScore();
 
 
 var snake = {
-  width: canvas.width / 10,
   style: "black",
-  size: 1,
   x: 0,
   y: 0,
   speed: 90,
-  parts: new Array()
+  move:function(x, y){
+    snake.x = x;snake.y = y;
+    //Clear Canvas
+    context.clearRect(0, 0, canvas.width, canvas.width);
+    //Render Snake
+    context.fillStyle = snake.style;
+    context.fillRect(x, y, width, width);
+    //Render Food
+    context.fillStyle = food.style;
+    context.fillRect(food.x, food.y, width, width);
+  }
 };
 
 
@@ -22,20 +35,15 @@ var food = {
   possibleX: [],
   possibleY: [],
   getpossibleXY: function() {
-    for (i = 0; i < canvas.width; i += snake.width)
+    for (i = 0; i < canvas.width; i += width)
       food.possibleX.push(i);
-    for (i = 0; i < canvas.height; i += snake.width)
+    for (i = 0; i < canvas.height; i += width)
       food.possibleY.push(i);
   },
-  generate: function() {
-    if (
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x || 
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.x + snake.width || 
-    food.possibleY[Math.floor(Math.random() * food.possibleX.length)] === snake.y || 
-    food.possibleX[Math.floor(Math.random() * food.possibleX.length)] === snake.y + snake.width)
-      food.generate();
-    else
-      move(food.possibleX[Math.floor(Math.random() * food.possibleX.length)], food.possibleY[Math.floor(Math.random() * food.possibleX.length)], food);
+  generateCoord: function() {
+    if(food.possibleX.length === 0) food.getpossibleXY();
+    food.x = food.possibleX[Math.floor(Math.random() * food.possibleX.length)];
+    food.y = food.possibleY[Math.floor(Math.random() * food.possibleY.length)];
   }
 };
 
@@ -50,63 +58,57 @@ document.addEventListener("keydown", function(event) {
     else
       keysPressed[i] = false;
   }
-  if(!started) started = true;
+  if (!started)
+    started = true;
 });
 
 
-food.getpossibleXY();
-console.log(food.possibleX);
-food.generate();
-move(snake.x === 0 ? 0 : snake.x, snake.y === 0 ? 0 : snake.y, snake);
+food.generateCoord();
+snake.move(0, 0);
 
 
-setInterval(function() {
+var gameLoop = setInterval(function() {
   
   if (keysPressed[0])
-    move(snake.x - snake.width, snake.y, snake);
+    snake.move(snake.x - width, snake.y);
   
   else if (keysPressed[1])
-    move(snake.x, snake.y - snake.width, snake);
+    snake.move(snake.x, snake.y - width);
   
   else if (keysPressed[2])
-    move(snake.x + snake.width, snake.y, snake);
+    snake.move(snake.x + width, snake.y);
   
   else if (keysPressed[3])
-    move(snake.x, snake.y + snake.width, snake);
+    snake.move(snake.x, snake.y + width);
   
-  if (snake.x < 0 || snake.y < 0 || snake.x > canvas.width-snake.width || snake.y > canvas.width - snake.width && started) restart();
+  if(snake.x === food.x && snake.y === food.y) score();
+      
+  if (snake.x < 0 || snake.y < 0 || snake.x > canvas.width - width || snake.y > canvas.width - width && started)
+    restart();
 
 }, snake.speed);
 
 
-function move(x, y, type) {
-  type.x = x;
-  type.y = y;
-  if (snake.x === food.x && snake.y === food.y) score();
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = type.style;
-  context.fillRect(x, y, snake.width, snake.width);
-  context.fill();
-  if (type === food)
-    context.save();
-  else {
-    context.fillStyle = food.style;
-    context.restore();
-    context.fillRect(food.x, food.y, snake.width, snake.width);
-  }
-}
-
-
 function restart() {
-  for(i = 0;i<keysPressed.length;i++)keysPressed[i] = false;
-  move(0, 0, snake);
+  for (i = 0; i < keysPressed.length; i++)
+    keysPressed[i] = false;
+  snake.move(0, 0);
   started = false;
+  currentScore = 0;
+  renderScore();
 }
 
 
-function score(){
+function score() {
   currentScore++;
-  snake.size++;
-  //snake.parts.push(x:)
-  food.generate();
+  if (currentScore > localStorage.highScore)
+    localStorage.highScore = currentScore;
+  food.generateCoord();
+  renderScore();
+}
+
+
+function renderScore(){
+  document.getElementById("currentScore").innerHTML ="Current Score: " + currentScore;
+  document.getElementById("highScore").innerHTML = "High Score: " + localStorage.highScore;
 }

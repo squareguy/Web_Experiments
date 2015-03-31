@@ -1,45 +1,187 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 <title>VideoPlayer</title>
 <meta charset="UTF-8">
 <style>
-body{font-family:'Open Sans', sans-serif;text-align:center;}
-input{display:inline-block;}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+video {
+  display: block;
+  margin: auto;
+}
+
+.container {
+  width: 100%;
+  margin: auto;
+}
+
+.large {
+  font-size: large;
+}
+
+progress {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+progress::-webkit-progress-bar {
+  background-color: transparent;
+}
+
+#buffered::-webkit-progress-value {
+  background-color: #000;
+}
+
+#played::-webkit-progress-value {
+  background-color: #fff;
+}
+
+#played {
+  z-index: 0;
+  position:absolute;
+  margin-top:4px;
+}
+#buffered {
+  z-index:-1;
+  position:relative;
+}
+
 </style>
 </head>
+
 <body>
+
 <h1>VideoPlayer</h1>
-<p><input type="file">OR<input type="url" placeholder="Paste URL and hit enter"></p>
-<video controls autoplay hidden></video>
+<div class="container">
+  <p class="hidden">Loading...</p>
+  <video class="hidden" controls hidden></video>
+  <progress id="played" value="0" max="100"></progress>
+  <progress id="buffered" value="0" max="100"></progress>
+</div>
+<div class="container large">
+
+  <span id="subtitle" class="hidden">
+    <strong>Add Subtitle:</strong>
+    <input type="file" id="trackInput" class="hidden"><button>Choose File</button>
+    |
+  </span>
+  
+  <span id="video">
+    <strong>Video:</strong>
+    <input type="file" id="fileInput" class="hidden"><button>Choose File</button>
+    or
+    <input type="url" placeholder="Paste URL and hit enter" id="url">
+  </span>
+
+</div>
 <script>
-var input = document.getElementsByTagName('input')[0];
-var video = document.getElementsByTagName('video')[0];
-input.onchange = function(event){
-    var file = input.files[0];
-    if(file.type.match('mp4') || file.type.match('webm') || file.type.match('ogg')){
-        var reader = new FileReader();
-        reader.onloadend = function(){plVideo(reader.result)};reader.readAsDataURL(file); input.value="";
-    }
-    else {alert("File type not supported, try again with a different file type.");input.value = "";}
+
+var 
+fileInput = document.getElementById("fileInput"), 
+video = document.getElementsByTagName('video')[0], 
+url = document.getElementById('url'), 
+trackInput = document.getElementById("trackInput"), 
+hasSrc = false, 
+loading = document.getElementsByTagName("p")[0], 
+played = document.getElementById("played"), 
+buffered = document.getElementById("buffered"), 
+progressInterval;
+
+fileInput.onchange = function(event) {
+  var file = fileInput.files[0];
+  if (!warn()) {
+    return;
+  }
+  if (file.type.match('mp4') || file.type.match('webm') || file.type.match('ogg')) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      plVideo(reader.result);
+    };
+    loading.removeAttribute("class");
+    reader.readAsDataURL(file);
+  } 
+  else {
+    alert("File type not supported, try again with a different file type.");
+  }
 };
-var inputU = document.getElementsByTagName('input')[1];
-inputU.oninput= function(){
-    if(inputU.checkValidity()){
-    var url = inputU.value;
-    plVideo(url);
-    inputU.value="";
-    }
-    else{alert('Invalid URL');inputU.value="";}
+
+url.onchange = function(event) {
+  if (event.keyCode !== 13 && !warn()) {
+    return;
+  }
+  
+  if (url.checkValidity()) {
+    plVideo(url.value);
+  } 
+  
+  else {
+    alert('Invalid URL');
+    url.value = "";
+  }
 };
-function plVideo(src){
-    if(video.hidden) video.removeAttribute('hidden');
-    video.src = src;
+
+function plVideo(src) {
+  video.src = src;
+  hasSrc = true;
+  video.play();
 }
-video.onclick = function(){
-    if(video.paused) video.play();
-    else video.pause();
+
+video.onloadeddata = function() {
+  video.removeAttribute('class');
+  loading.setAttribute("class", "hidden");
+  console.log(video.scrollWidth);
+  played.style.width = video.scrollWidth + "px";
+  buffered.style.width = video.scrollWidth + "px";
+  video.play();
+};
+
+video.onclick = function(event) {
+  event.preventDefault();
+  if (video.paused) {
+    video.play();
+  } 
+  else {
+    video.pause();
+  }
 }
+
+var warn = function() {
+  if (hasSrc) {
+    return confirm("Are you sure you want to play another video?");
+  } 
+  else {
+    return true;
+  }
+}
+document.getElementsByTagName('button')[1].addEventListener("click", function() {
+  fileInput.click();
+});
+
+document.getElementsByTagName('button')[0].addEventListener("click", function() {
+  trackInput.click();
+});
+
+video.onplay = function() {
+  progressInterval = setInterval(function() {
+    played.value = Math.floor(100 * video.currentTime / video.duration);
+    buffered.value = Math.floor(100 * video.buffered.end(0) / video.duration);
+  }, 100);
+};
+
+video.onpause = function() {
+  clearInterval(progressInterval);
+};
 </script>
 </body>
 </html>
